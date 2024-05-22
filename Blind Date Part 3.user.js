@@ -13,4 +13,5 @@
     'use strict';
 
     window.open('','_self').close()
+    // Do not use until issue with Kraken reloads being needed is resolved.
 })();
