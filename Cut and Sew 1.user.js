@@ -19,7 +19,7 @@
     }
 
     function waitForElm(selector)
-    // This is basically a function that delays code from running until something on the page has loaded. In this case we are using this to await the special "HH data random number that I don't recognise" number that Kraken loads on the properties tab.
+    // This is basically a function that delays code from running until something on the page has loaded. In this case we are using this to wait for the billing timeline to load.
     {
         return new Promise(resolve =>
                            {
