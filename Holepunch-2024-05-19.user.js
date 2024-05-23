@@ -2,7 +2,7 @@
 // @name         Holepunch
 // @namespace    http://tampermonkey.net/
 // @version      2024-05-19
-// @description  Repeatedly bills a meterpoint in 7 day increments. Helps narrow down the exact date where there is missing HH data.
+// @description  Repeatedly bills a meterpoint in 7 day increments. Helps narrow down the exact date where there is missing HH data that Kraken is not reporting.
 // @author       Liam Jacobs
 // @match        https://kraken.octopus.energy/accounts/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=octopus.energy
