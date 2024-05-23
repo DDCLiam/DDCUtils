@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Blind Date Part 1: Here Comes the Sun
 // @namespace    http://tampermonkey.net/
-// @version      2024-05-16
-// @description  This one inserts a textbox and a button onto the properties tab. When the button is hit, the data from the textbox is taken, some work is done in it, it is split into groups of date ranges up to 7 days, and then numerous windows are opened to request data from the DCC.
+// @version      2024-05-23
+// @description  Inserts a div onto the properties tab containing a textbox and two buttons - one to toggle the tool, and one to act as a "Go" button. When the "Go" is hit, the data from the textbox is taken, some work is done in it, it is split into groups of date ranges up to 7 days, and then numerous windows are opened to request data from the DCC.
 // @author       Liam Jacobs
 // @match        https://kraken.octopus.energy/accounts/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=octopus.energy
@@ -14,6 +14,8 @@
     'use strict';
     const container = document.createElement('div');
     const appTitle = document.createTextNode("BlindDate");
+    const hider = document.createElement('div');
+
     // We create elements for the container + title of the tool.
 
     window.navigation.addEventListener("navigate", (event) =>
@@ -76,27 +78,37 @@
         container.style.borderRadius = ".8rem";
         container.style.boxShadow = "0 .1rem .3rem rgba(0, 0, 0, .1)";
 
+
         // Create a text area for input
         const textArea = document.createElement('textarea');
         textArea.id = 'feedMeDates';
         textArea.rows = 5;
         textArea.cols = 30;
         textArea.placeholder = 'Please enter the missing dates';
-
-        const pageBreak = document.createElement('br');
+        textArea.style.display = "block";
 
         // Create a button to run the script
         const button = document.createElement('button');
-        button.innerHTML = "<button style = 'color: white; font-size: 1.6rem; font-weight: 500; line-height: 1.25;' type = 'button' value = 'Get HH data' onclick='workaround();'>Get HH data";
-        button.classList.add('tako-button');
-        button.classList.add('tako-button--primary');
+        button.innerHTML = "<button class = 'tako-button tako-button--primary' style = 'color: white; font-size: 1.6rem; font-weight: 500; line-height: 1.25; display: block;' type = 'button' id = 'blindDateButton' value = 'Get HH data' onclick='workaround();'>Get HH data";
 
+        // Create a button to show the GUI
+        const hideButton = document.createElement('button');
+        hideButton.innerHTML = "<button class = 'tako-button tako-button--secondary' style = 'color: white; font-size: 1.6rem; font-weight: 500; line-height: 1.25; display: block;' type = 'button' id = 'blindDateHideButton' value = 'Hide →' onclick='toggleBlindDate();'> Hide →"
+
+        const pageBreak = document.createElement('br');
 
         // Append the text area and button to the container
-        container.appendChild(appTitle);
-        container.appendChild(pageBreak);
-        container.appendChild(textArea);
-        container.appendChild(button);
+        container.appendChild(hider);
+        hider.appendChild(appTitle);
+        hider.appendChild(pageBreak);
+        hider.appendChild(textArea);
+        hider.appendChild(pageBreak);
+        hider.appendChild(button);
+        container.appendChild(hideButton);
+
+        hider.style.display = "none";
+        container.style.width = "72px";
+        hideButton.outerHTML = "<button class = 'tako-button tako-button--secondary' style = 'color: white; font-size: 1.6rem; font-weight: 500; line-height: 1.25; display: block;' type = 'button' id = 'blindDateHideButton' value = '←' onclick='toggleBlindDate();'> ←";
 
         // Append the container to the body
         document.body.appendChild(container);
@@ -106,12 +118,18 @@
     {
         // Once Kraken finishes loading the property tab
 
-        unsafeWindow.workaround = workaround
+        unsafeWindow.workaround = workaround;
+        unsafeWindow.toggleBlindDate = toggleBlindDateWorkaround;
         // The absolute bane of my existence. Userscripts operate out of a sandbox, and so when code is injected onto the page, it cannot invoke functions written inside of the sandbox. The only workaround for this is to force an entire browser into "unsafe" mode, and then share a function that calls another function from within the sandbox.
         // I could double the length of the script writing about my hatred for this and how I worked out how to do this, so I will just say the following: If you think about this code long enough it will stop working. Ignore it or suffer its wrath.
         function workaround()
         {
             liamMagic();
+        }
+
+        function toggleBlindDateWorkaround()
+        {
+            toggleBlindDate();
         }
 
         function liamMagic()
@@ -246,6 +264,26 @@
         function parseDatesFromString(dateString)
         {
             return dateString.split(',').map(date => date.trim());
+        }
+
+        function toggleBlindDate()
+        {
+            var dateBox = document.getElementById("feedMeDates");
+            var toggleButton = document.getElementById("blindDateHideButton");
+            var goButton = document.getElementById("blindDateButton");
+
+            if (hider.style.display == "block")
+            {
+                hider.style.display = "none";
+                container.style.width = "72px";
+                toggleButton.outerHTML = "<button class = 'tako-button tako-button--secondary' style = 'color: white; font-size: 1.6rem; font-weight: 500; line-height: 1.25; display: block;' type = 'button' id = 'blindDateHideButton' value = '←' onclick='toggleBlindDate();'> ←";
+            }
+            else
+            {
+                hider.style.display = "block";
+                container.style.width = "316px";
+                toggleButton.outerHTML = "<button class = 'tako-button tako-button--secondary' style = 'color: white; font-size: 1.6rem; font-weight: 500; line-height: 1.25; display: block;' type = 'button' id = 'blindDateHideButton' value = 'Hide →' onclick='toggleBlindDate();'> Hide →";
+            }
         }
 
         addUI()
