@@ -19,7 +19,7 @@
     }
 
     function waitForElm(selector)
-    // This is basically a function that delays code from running until something on the page has loaded. In this case we are using this to wait for the billing timeline to load.
+    // This is basically a function that delays code from running until something on the page has loaded. In this case we are using this to await the special "HH data random number that I don't recognise" number that Kraken loads on the properties tab.
     {
         return new Promise(resolve =>
                            {
@@ -60,6 +60,7 @@
         if (document.activeElement.nodeName === "INPUT")
         {
             if (document.activeElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.className == "tako-checkbox__label")
+                // This workaround was dirty to begin with, and now it is broken. TODO: Find correct element to ensure we're working on a date input.
             {
                 var value = e.clipboardData.getData('text');
                 var newDate = new Date(value);
@@ -78,7 +79,7 @@
         waitForElm('.billing-history-reset').then((elm) =>
                                                   {
 
-            var timelinempxns = document.getElementsByClassName("tako-checkbox__label");
+            var timelinempxns = document.getElementsByClassName("tako-flex--gap-md");
             var propertympxns = document.getElementsByClassName("properties__item properties__item--success");
             var exportList = []
 
@@ -95,16 +96,19 @@
 
             // We get all of the MPxNs from the billing timeline.
 
-            for (i = 0; i < timelinempxns.length; i ++)
+            for (i = 0; i < timelinempxns[0].childNodes.length; i ++)
             {
-                var thisMPxN = timelinempxns[i].innerHTML;
-
-                timelinempxns[i].parentNode.children[0].setAttribute("disabled", "");
-                timelinempxns[i].parentNode.children[0].setAttribute("readonly", "");
-
-                if (timelinempxns[i].innerHTML.length == 13)
+                if (timelinempxns[0].childNodes[i].tagName == "LABEL")
                 {
-                    timelinempxns[i].innerHTML += "<p><input type = 'button' class = 'tako-button tako-button--primary' value = 'Cut & Sew' onclick='showGUI(" + thisMPxN + ")'><div id='splitAndSplice_" + thisMPxN + "' style='width: 300px; display: none; box-shadow: rgba(0, 0, 0, 0.25) 0px 0.3rem 0.7rem; border-radius: .8rem !important; border-spacing: 0px !important; border-collapse: separate !important;'> <table class='ItemA' style='border-radius: .8rem !important; border-spacing: 0 !important; border-collapse: separate !important; background-color: #EEEEEE; width: 100%; text-align: left; border-collapse: collapse;'> <thead style='border: 1px solid #000; background: #721CE3;'> <tr> <th style='border-top-left-radius: .8rem !important; border-top-right-radius: .8rem !important; border-spacing: 0 !important; border-collapse: separate !important; padding: 5px 5px; font-size: 15px; font-weight: bold; color: #FFFFFF;'>Cut &amp; Sew<br><span id='errorbox_" + thisMPxN + "' style = 'color: white'>Ready to go</span></th> </tr> </thead> <tfoot style='border-radius: 0.8rem !important; border-spacing: 0px !important; font-size: 14px; font-weight: bold; color: #FFFFFF; background: #fafafa;'><tr><td style='color:white; border-bottom-left-radius: .8rem !important; border-bottom-right-radius: .8rem !important; border-spacing: 0 !important; border-collapse: separate !important; padding: 5px 5px;'> <input type='button' style='color: white;' id = 'submit_" + thisMPxN + "' onclick='cutandsew(" + thisMPxN + ")' class = 'tako-button tako-button--primary' value='Splice in Flexible Octopus'> </td> </tr> </tfoot> <tbody style='background: white'> <tr> <td style='border: 0px solid #AAAAAA; padding: 5px 5px;'> Start date: <input type='date' id = 'from_" + thisMPxN + "'> <br><br> End date: <input type='date' id = 'to_" + thisMPxN + "'> </td> </tr> </tbody> </table></div> </div>"
+                    var thisMPxN = timelinempxns[0].childNodes[i];
+                    var test = thisMPxN.innerHTML.split(">");
+                    var test2 = test[1].split("<");
+                    thisMPxN = test2[0].trim();
+
+                    if (thisMPxN.length == 13)
+                    {
+                        timelinempxns[0].childNodes[i].innerHTML += "<p><input type = 'button' class = 'tako-button tako-button--primary' value = 'Cut & Sew' onclick='showGUI(" + thisMPxN + ")'><div id='splitAndSplice_" + thisMPxN + "' style='width: 300px; display: none; box-shadow: rgba(0, 0, 0, 0.25) 0px 0.3rem 0.7rem; border-radius: .8rem !important; border-spacing: 0px !important; border-collapse: separate !important;'> <table class='ItemA' style='border-radius: .8rem !important; border-spacing: 0 !important; border-collapse: separate !important; background-color: #EEEEEE; width: 100%; text-align: left; border-collapse: collapse;'> <thead style='border: 1px solid #000; background: #721CE3;'> <tr> <th style='border-top-left-radius: .8rem !important; border-top-right-radius: .8rem !important; border-spacing: 0 !important; border-collapse: separate !important; padding: 5px 5px; font-size: 15px; font-weight: bold; color: #FFFFFF;'>Cut &amp; Sew<br><span id='errorbox_" + thisMPxN + "' style = 'color: white'>Ready to go</span></th> </tr> </thead> <tfoot style='border-radius: 0.8rem !important; border-spacing: 0px !important; font-size: 14px; font-weight: bold; color: #FFFFFF; background: #fafafa;'><tr><td style='color:white; border-bottom-left-radius: .8rem !important; border-bottom-right-radius: .8rem !important; border-spacing: 0 !important; border-collapse: separate !important; padding: 5px 5px;'> <input type='button' style='color: white;' id = 'submit_" + thisMPxN + "' onclick='cutandsew(" + thisMPxN + ")' class = 'tako-button tako-button--primary' value='Splice in Flexible Octopus'> </td> </tr> </tfoot> <tbody style='background: white'> <tr> <td style='border: 0px solid #AAAAAA; padding: 5px 5px;'> Start date: <input type='date' id = 'from_" + thisMPxN + "'> <br><br> End date: <input type='date' id = 'to_" + thisMPxN + "'> </td> </tr> </tbody> </table></div> </div>"
+                    }
                 }
             }
 
