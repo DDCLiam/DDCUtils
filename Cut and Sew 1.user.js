@@ -59,20 +59,56 @@
         // We "listen" to the browser to see when dates have been pasted
         if (document.activeElement.nodeName === "INPUT")
         {
-            if (document.activeElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.className == "tako-checkbox__label")
-                // This workaround was dirty to begin with, and now it is broken. TODO: Find correct element to ensure we're working on a date input.
+            if (document.activeElement.outerHTML.includes("from_") || document.activeElement.outerHTML.includes("to_"))
+            // Check if we're talking to one of the date inputs from Cut & Sew. I could expand this to work against a class, should I need this functionality elsewhere.
             {
                 var value = e.clipboardData.getData('text');
                 var newDate = new Date(value);
 
+                newDate = new Date(newDate.getTime() + Math.abs(newDate.getTimezoneOffset() * 60000));
+                // We add 1 minute to the given date, as if we parse a string like "05 May 2024" it parses as 00:00 hours, which toISOString interprets as the day before, for some reason. This has no affect on any other date formats.
+
                 if (Object.prototype.toString.call(newDate) === '[object Date]')
                 {
                     newDate = newDate.toISOString().split('T')[0];
+                    // Convert the date from "Human" to "Kraken".
+
                     document.activeElement.value = newDate;
+                    // Populate our date input with the new value.
+
+                    var thisMPxN = "ERROR";
+                    // We get the MPxN that this field is affecting (quick and dirty, but it works!)
+                    if (document.activeElement.outerHTML.includes("from_"))
+                    {
+                        thisMPxN = document.activeElement.outerHTML.split("from_")[1];
+                    }
+                    if (document.activeElement.outerHTML.includes("to_"))
+                    {
+                        thisMPxN = document.activeElement.outerHTML.split("to_")[1];
+                    }
+
+                    thisMPxN = thisMPxN.substring(0, thisMPxN.length - 2);
+
+                    updateDateInput(thisMPxN);
+
                 }
             }
         }
     });
+
+
+    function updateDateInput(MPxN)
+    {
+        var newDate = new Date(document.getElementById("from_" + MPxN).value);
+        newDate.setDate(newDate.getDate() + 1);
+        newDate = newDate.toISOString().split('T')[0];
+        // We grab the date from the "from" field, and if the "to" field is blank, populate it with the day after.
+
+        if (document.getElementById("to_" + MPxN).value == "")
+        {
+            document.getElementById("to_" + MPxN).value = newDate;
+        }
+    }
 
     function startCutAndSew()
     {
@@ -107,7 +143,7 @@
 
                     if (thisMPxN.length == 13)
                     {
-                        timelinempxns[0].childNodes[i].innerHTML += "<p><input type = 'button' class = 'tako-button tako-button--primary' value = 'Cut & Sew' onclick='showGUI(" + thisMPxN + ")'><div id='splitAndSplice_" + thisMPxN + "' style='width: 300px; display: none; box-shadow: rgba(0, 0, 0, 0.25) 0px 0.3rem 0.7rem; border-radius: .8rem !important; border-spacing: 0px !important; border-collapse: separate !important;'> <table class='ItemA' style='border-radius: .8rem !important; border-spacing: 0 !important; border-collapse: separate !important; background-color: #EEEEEE; width: 100%; text-align: left; border-collapse: collapse;'> <thead style='border: 1px solid #000; background: #721CE3;'> <tr> <th style='border-top-left-radius: .8rem !important; border-top-right-radius: .8rem !important; border-spacing: 0 !important; border-collapse: separate !important; padding: 5px 5px; font-size: 15px; font-weight: bold; color: #FFFFFF;'>Cut &amp; Sew<br><span id='errorbox_" + thisMPxN + "' style = 'color: white'>Ready to go</span></th> </tr> </thead> <tfoot style='border-radius: 0.8rem !important; border-spacing: 0px !important; font-size: 14px; font-weight: bold; color: #FFFFFF; background: #fafafa;'><tr><td style='color:white; border-bottom-left-radius: .8rem !important; border-bottom-right-radius: .8rem !important; border-spacing: 0 !important; border-collapse: separate !important; padding: 5px 5px;'> <input type='button' style='color: white;' id = 'submit_" + thisMPxN + "' onclick='cutandsew(" + thisMPxN + ")' class = 'tako-button tako-button--primary' value='Splice in Flexible Octopus'> </td> </tr> </tfoot> <tbody style='background: white'> <tr> <td style='border: 0px solid #AAAAAA; padding: 5px 5px;'> Start date: <input type='date' id = 'from_" + thisMPxN + "'> <br><br> End date: <input type='date' id = 'to_" + thisMPxN + "'> </td> </tr> </tbody> </table></div> </div>"
+                        timelinempxns[0].childNodes[i].innerHTML += "<p><input type = 'button' class = 'tako-button tako-button--primary' value = 'Cut & Sew' onclick='showGUI(" + thisMPxN + ")'><div id='splitAndSplice_" + thisMPxN + "' style='width: 300px; display: none; box-shadow: rgba(0, 0, 0, 0.25) 0px 0.3rem 0.7rem; border-radius: .8rem !important; border-spacing: 0px !important; border-collapse: separate !important;'> <table class='ItemA' style='border-radius: .8rem !important; border-spacing: 0 !important; border-collapse: separate !important; background-color: #EEEEEE; width: 100%; text-align: left; border-collapse: collapse;'> <thead style='border: 1px solid #000; background: #721CE3;'> <tr> <th style='border-top-left-radius: .8rem !important; border-top-right-radius: .8rem !important; border-spacing: 0 !important; border-collapse: separate !important; padding: 5px 5px; font-size: 15px; font-weight: bold; color: #FFFFFF;'>Cut &amp; Sew<br><span id='errorbox_" + thisMPxN + "' style = 'color: white'>Ready to go</span></th> </tr> </thead> <tfoot style='border-radius: 0.8rem !important; border-spacing: 0px !important; font-size: 14px; font-weight: bold; color: #FFFFFF; background: #fafafa;'><tr><td style='color:white; border-bottom-left-radius: .8rem !important; border-bottom-right-radius: .8rem !important; border-spacing: 0 !important; border-collapse: separate !important; padding: 5px 5px;'> <input type='button' style='color: white;' id = 'submit_" + thisMPxN + "' onclick='cutandsew(" + thisMPxN + ")' class = 'tako-button tako-button--primary' value='Splice in Flexible Octopus'> </td> </tr> </tfoot> <tbody style='background: white'> <tr> <td style='border: 0px solid #AAAAAA; padding: 5px 5px;'> Start date: <input onchange='updateDateInput(" + thisMPxN +")' type='date' id = 'from_" + thisMPxN + "'> <br><br> End date: <input type='date' id = 'to_" + thisMPxN + "'> </td> </tr> </tbody> </table></div> </div>"
                     }
                 }
             }
@@ -169,18 +205,15 @@
                     if (isGas)
                     {
                         gasAgreementData.push([aID, aStart, aEnd]);
-                        console.log("Gas: ", aID);
                         // Add it to the gas agreement list if it's gas.
                     }
                     else if (exportList.includes(thismpxn.toString()))
                     {
-                        console.log("Export: ", aID);
                         exportAgreementData.push([aID, aStart, aEnd]);
                         // Add it to the export agreement list if it's export.
                     }
                     else
                     {
-                        console.log("Elec: ", aID);
                         elecAgreementData.push([aID, aStart, aEnd]);
                         // Add it to the elec agreement list if it's elec.
                     }
@@ -396,6 +429,7 @@
 
             unsafeWindow.showGUI = bypassShowGUI;
             unsafeWindow.cutandsew = bypassCutAndSew;
+            unsafeWindow.updateDateInput = bypassUpdateDateInput;
             // Disgusting workaround because Javascript wants me dead. Getting more information on this is between you and God because I barely understand how it works, myself.
 
             function bypassShowGUI(arg)
@@ -406,6 +440,11 @@
             function bypassCutAndSew(arg)
             {
                 cutandsew(arg);
+            }
+
+            function bypassUpdateDateInput(arg)
+            {
+                updateDateInput(arg);
             }
 
             // Our list of all of the active tariff codes from 2018 - 2100-01-01. This means that this tool will break in the year 2100. If you're reading this after the year 2100, just change this to 2200 and you'll be golden.
