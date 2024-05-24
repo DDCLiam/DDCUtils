@@ -59,17 +59,22 @@
     {
         waitForElm('.billing-history-reset').then((elm) =>
                                                   {
-            var timelinempxns = document.getElementsByClassName("tako-checkbox__label");
+            var timelinempxns = document.getElementsByClassName("tako-flex--gap-md");
 
             // We grab all of the MPxNs from the timeline (usually we have Cut & Sew installed, so we also strip out the data that inserted into the elements).
 
-            for (var i = 0; i < timelinempxns.length; i ++)
+            for (var i = 0; i < timelinempxns[0].childNodes.length; i ++)
             {
-                var thisMPxN = timelinempxns[i].innerHTML.split("<")[0];
+                if (timelinempxns[0].childNodes[i].tagName == "LABEL")
+                {
+                    var thisMPxN = timelinempxns[0].childNodes[i];
+                    var test = thisMPxN.innerHTML.split(">");
+                    var test2 = test[1].split("<");
+                    thisMPxN = test2[0].trim();
 
-                timelinempxns[i].innerHTML += "<p><input type = 'button' class = 'tako-button tako-button--primary' value = 'BillGates' onclick='billgates(" + thisMPxN + ")'>"
-                // Shoe-horn in a button that runs our 'billgates' function below.
-
+                    timelinempxns[0].childNodes[i].innerHTML += "<p><input type = 'button' class = 'tako-button tako-button--primary' value = 'BillGates' onclick='billgates(" + thisMPxN + ")'>"
+                    // Shoe-horn in a button that runs our 'billgates' function below.
+                }
             }
 
             function billgates(mpxn)
