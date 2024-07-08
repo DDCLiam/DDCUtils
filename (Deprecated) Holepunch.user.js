@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Holepunch
+// @name         (Deprecated) Holepunch
 // @namespace    http://tampermonkey.net/
 // @version      2024-05-19
 // @description  Repeatedly bills a meterpoint in 7 day increments. Helps narrow down the exact date where there is missing HH data that Kraken is not reporting.
