@@ -102,12 +102,8 @@
         var newDate = new Date(document.getElementById("from_" + MPxN).value);
         newDate.setDate(newDate.getDate() + 1);
         newDate = newDate.toISOString().split('T')[0];
-        // We grab the date from the "from" field, and if the "to" field is blank, populate it with the day after.
-
-        if (document.getElementById("to_" + MPxN).value == "")
-        {
-            document.getElementById("to_" + MPxN).value = newDate;
-        }
+        // We grab the date from the "from" field and update the "to" field with the day after.
+        document.getElementById("to_" + MPxN).value = newDate;
     }
 
     function startCutAndSew()
