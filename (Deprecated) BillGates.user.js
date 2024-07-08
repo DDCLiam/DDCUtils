@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         BillGates
+// @name         (Deprecated) BillGates
 // @namespace    http://tampermonkey.net/
 // @version      2024-05-19
 // @description  Attempts to bill all gaps for a given MPxN.
