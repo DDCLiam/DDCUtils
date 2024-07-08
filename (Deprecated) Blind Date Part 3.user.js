@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Blind Date Part 3: The Final Jamboree
+// @name         (Deprecated) Blind Date Part 3: The Final Jamboree
 // @namespace    http://tampermonkey.net/
 // @version      2024-05-17
 // @description  This one just closes the "Close window" tab that opens after requesting HH reads.
